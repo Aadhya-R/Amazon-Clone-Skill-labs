@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 
 function Navbar() {
+  const { cartItems } = useCart()
+
   return (
     <nav style={{
       backgroundColor: '#131921',
@@ -13,7 +16,9 @@ function Navbar() {
         🛒 Amazon Clone
       </Link>
       <div style={{ display: 'flex', gap: '20px' }}>
-        <Link to="/cart"  style={{ color: 'white', textDecoration: 'none' }}>Cart</Link>
+        <Link to="/cart" style={{ color: 'white', textDecoration: 'none' }}>
+          Cart {cartItems.length > 0 && `(${cartItems.length})`}
+        </Link>
         <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link>
       </div>
     </nav>
