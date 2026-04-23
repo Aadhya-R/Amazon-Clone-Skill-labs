@@ -33,38 +33,32 @@ const mockProducts = [
 
 let mockCart = { items: [] };
 
-// --- MOCK MIDDLEWARE ---
-app.use((req, res, next) => {
-  if (!dbConnected) {
-    // 1. Get All Products
-    if (req.path === '/products' && req.method === 'GET') return res.json(mockProducts);
-    
-    // 2. Get Single Product
-    if (req.path.startsWith('/products/') && req.method === 'GET') {
-      const id = req.path.split('/')[2];
-      const product = mockProducts.find(p => p._id === id);
-      return product ? res.json(product) : res.status(404).json({ message: 'Mock Product Not Found' });
+// --- MOCK ROUTES (Only active if DB fails) ---
+const handleMock = (req, res, next) => {
+  if (!dbConnected) return next();
+  next();
+};
+
+app.use('/products', (req, res, next) => {
+  if (!dbConnected && req.method === 'GET') {
+    if (req.path === '/' || req.path === '') {
+      console.log('📦 Serving MOCK Products');
+      return res.json(mockProducts);
     }
-    
-    // 3. Mock Login
-    if (req.path === '/auth/login' && req.method === 'POST') {
-      return res.json({ token: 'mock-jwt-token', name: 'Demo User', userId: 'mock-user-123' });
+    const id = req.path.split('/')[1];
+    const product = mockProducts.find(p => p._id === id);
+    if (product) {
+      console.log(`📦 Serving MOCK Product: ${id}`);
+      return res.json(product);
     }
-    
-    // 4. Mock Cart
-    if (req.path === '/cart' && req.method === 'GET') return res.json(mockCart);
-    
-    if (req.path === '/cart/add' && req.method === 'POST') {
-      const { productId, quantity } = req.body;
-      const product = mockProducts.find(p => p._id === productId);
-      const existing = mockCart.items.find(i => i.productId._id === productId);
-      if (existing) {
-        existing.quantity += (quantity || 1);
-      } else if (product) {
-        mockCart.items.push({ _id: Date.now().toString(), productId: product, quantity: quantity || 1 });
-      }
-      return res.json(mockCart);
-    }
+  }
+  next();
+});
+
+app.use('/auth/login', (req, res, next) => {
+  if (!dbConnected && req.method === 'POST') {
+    console.log('🔑 Mock Login');
+    return res.json({ token: 'mock-jwt-token', name: 'Demo User', userId: 'mock-123' });
   }
   next();
 });

@@ -14,7 +14,14 @@ import { useCart } from './context/CartContext'
 
 export default function App() {
   const { cartItems } = useCart()
-  const user = JSON.parse(localStorage.getItem('user'))
+  
+  let user = null;
+  try {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) user = JSON.parse(savedUser);
+  } catch (err) {
+    console.error('Error parsing user from localStorage', err);
+  }
 
   return (
     <BrowserRouter>

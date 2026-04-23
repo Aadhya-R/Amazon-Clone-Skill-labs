@@ -10,8 +10,20 @@ function ProductList() {
 
   useEffect(() => {
     API.get('/products')
-      .then(res => setProducts(res.data))
-      .catch(err => console.error('Failed to fetch products', err))
+      .then(res => {
+        if (res.data && res.data.length > 0) {
+          setProducts(res.data);
+        } else {
+          throw new Error('Empty data');
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch products, using internal fallback', err);
+        setProducts([
+          { _id: '1', title: 'iPhone 15 Pro', price: 129900, image: 'https://m.media-amazon.com/images/I/81SigAnN7KL._AC_SL1500_.jpg' },
+          { _id: '2', title: 'Sony WH-1000XM5', price: 29990, image: 'https://m.media-amazon.com/images/I/51aBv7SXYfL._AC_SL1200_.jpg' }
+        ]);
+      })
       .finally(() => setLoading(false))
   }, [])
 

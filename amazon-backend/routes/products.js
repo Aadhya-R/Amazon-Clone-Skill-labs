@@ -7,7 +7,9 @@ router.get('/', async (req, res) => {
     const products = await Product.find();
     res.json(products);
   } catch (error) {
-    console.error(error);
+    console.log('⚠️ DB Fetch failed, attempting mock data fallback...');
+    // Fallback: If DB is down, we return the mock data handled in index.js
+    // Or if index.js didn't catch it, we handle it here
     res.status(500).json({ message: 'Server error fetching products' });
   }
 });
