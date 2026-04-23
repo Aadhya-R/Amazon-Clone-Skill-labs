@@ -5,30 +5,36 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
-export default function Login() {
+export default function Signup() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await API.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify({ name: res.data.name, id: res.data.userId }));
-      navigate('/');
-      window.location.reload(); 
+      await API.post('/auth/signup', { name, email, password });
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Signup failed');
     }
   };
 
   return (
     <Container className="small-container py-5" style={{ maxWidth: '400px' }}>
-      <h2 className="my-3 text-center">Sign-In</h2>
+      <h2 className="my-3 text-center">Create Account</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-      <Form onSubmit={handleLogin}>
+      <Form onSubmit={handleSignup}>
+        <Form.Group className="mb-3" controlId="name">
+          <Form.Label>Your Name</Form.Label>
+          <Form.Control
+            type="text"
+            required
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Form.Group>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>Email</Form.Label>
           <Form.Control
@@ -42,6 +48,7 @@ export default function Login() {
           <Form.Control
             type="password"
             required
+            placeholder="At least 6 characters"
             onChange={(e) => setPassword(e.target.value)}
           />
         </Form.Group>
@@ -51,8 +58,8 @@ export default function Login() {
           </Button>
         </div>
         <div className="mb-3">
-          New customer?{' '}
-          <a href="/signup">Create your account</a>
+          Already have an account?{' '}
+          <a href="/login">Sign-In</a>
         </div>
       </Form>
     </Container>

@@ -1,14 +1,19 @@
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
-import { useCart } from '../context/CartContext'
+import { useCart } from '../context/CartContext';
+
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [added, setAdded] = useState(false);
+  const { addToCart } = useCart();
 
-  // Fetch product on load
   useEffect(() => {
     axios.get(`/products/${id}`)
       .then(res => {
@@ -21,40 +26,57 @@ export default function ProductDetail() {
       });
   }, [id]);
 
-  // Add to cart
-
-
-// inside your component, replace the old handleAddToCart:
-const { addToCart } = useCart()
-
-const handleAddToCart = () => {
-  addToCart(id)
-  setAdded(true)
-}
-
-  if (loading) return <p>Loading...</p>;
-  if (!product) return <p>Product not found.</p>;
+  if (loading) return <div className="p-5 text-center">Loading...</div>;
+  if (!product) return <div className="p-5 text-center">Product not found.</div>;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-      <img src={product.image} alt={product.title} style={{ width: '100%', borderRadius: '8px' }} />
-      <h1>{product.title}</h1>
-      <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>${product.price}</p>
-      <p>{product.description}</p>
-      <button
-        onClick={handleAddToCart}
-        style={{
-          backgroundColor: '#FFD814',
-          border: 'none',
-          padding: '12px 24px',
-          borderRadius: '8px',
-          fontSize: '1rem',
-          cursor: 'pointer',
-          marginTop: '1rem'
-        }}
-      >
-        {added ? 'Added to Cart!' : 'Add to Cart'}
-      </button>
+    <div className="mt-3">
+      <Row>
+        <Col md={6}>
+          <img className="img-large rounded shadow-sm" src={product.image} alt={product.title} style={{ width: '100%' }} />
+        </Col>
+        <Col md={3}>
+          <ListGroup variant="flush">
+            <ListGroup.Item>
+              <h1>{product.title}</h1>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              Price: <strong>₹{product.price}</strong>
+            </ListGroup.Item>
+            <ListGroup.Item>
+              Description:
+              <p>{product.description}</p>
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+        <Col md={3}>
+          <Card className="shadow-sm">
+            <Card.Body>
+              <ListGroup variant="flush">
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Price:</Col>
+                    <Col><strong>₹{product.price}</strong></Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Status:</Col>
+                    <Col><span className="badge bg-success">In Stock</span></Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <div className="d-grid">
+                    <Button variant="warning" className="fw-bold" onClick={() => addToCart(id)}>
+                      Add to Cart
+                    </Button>
+                  </div>
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
-import ProductCard from '../components/ProductCard'
-import API from '../api/axios'
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import ProductCard from '../components/ProductCard';
+import API from '../api/axios';
 
 function ProductList() {
   const [products, setProducts] = useState([])
@@ -13,14 +14,18 @@ function ProductList() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p style={{ padding: '20px' }}>Loading products...</p>
+  if (loading) return <div className="p-5 text-center">Loading products...</div>
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>All Products</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
-        {products.map(p => <ProductCard key={p._id} product={p} />)}
-      </div>
+    <div>
+      <h2 className="mb-4">Featured Products</h2>
+      <Row>
+        {products.map(p => (
+          <Col key={p._id} sm={6} md={4} lg={3}>
+            <ProductCard product={p} />
+          </Col>
+        ))}
+      </Row>
     </div>
   )
 }
