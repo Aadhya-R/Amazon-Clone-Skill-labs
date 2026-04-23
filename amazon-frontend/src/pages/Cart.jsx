@@ -1,25 +1,13 @@
-import { useState, useEffect } from 'react'
-import API from '../api/axios'
+import { useCart } from '../context/CartContext'
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { cartItems, removeFromCart } = useCart()
 
-  useEffect(() => {
-    API.get('/cart')
-      .then(res => {
-        setCartItems(res.data)
-        setLoading(false)
-      })
-      .catch(err => {
-        console.error('Failed to load cart', err)
-        setLoading(false)
-      })
-  }, [])
+  const total = cartItems.reduce((sum, item) => {
+    // item.productId is populated, so we access item.productId.price
+    return sum + (item.productId?.price || 0) * item.quantity
+  }, 0)
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-
-  if (loading) return <p style={{ padding: '2rem' }}>Loading...</p>
   if (cartItems.length === 0) return <p style={{ padding: '2rem' }}>Your cart is empty.</p>
 
   return (
@@ -30,14 +18,20 @@ export default function Cart() {
           display: 'flex', alignItems: 'center', gap: '16px',
           borderBottom: '1px solid #ddd', padding: '12px 0'
         }}>
-          <img src={item.image} alt={item.title}
+          <img src={item.productId?.image} alt={item.productId?.title}
             style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
           <div style={{ flex: 1 }}>
-            <h4 style={{ margin: 0 }}>{item.title}</h4>
-            <p style={{ color: '#B12704', fontWeight: 'bold', margin: '4px 0' }}>₹{item.price}</p>
+            <h4 style={{ margin: 0 }}>{item.productId?.title}</h4>
+            <p style={{ color: '#B12704', fontWeight: 'bold', margin: '4px 0' }}>₹{item.productId?.price}</p>
             <p style={{ margin: 0, color: '#555' }}>Qty: {item.quantity}</p>
           </div>
-          <p style={{ fontWeight: 'bold' }}>₹{item.price * item.quantity}</p>
+          <button 
+            onClick={() => removeFromCart(item.productId?._id)}
+            style={{ backgroundColor: 'transparent', border: '1px solid #ddd', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Remove
+          </button>
+          <p style={{ fontWeight: 'bold' }}>₹{(item.productId?.price || 0) * item.quantity}</p>
         </div>
       ))}
       <h3 style={{ textAlign: 'right', marginTop: '1rem' }}>Total: ₹{total}</h3>
