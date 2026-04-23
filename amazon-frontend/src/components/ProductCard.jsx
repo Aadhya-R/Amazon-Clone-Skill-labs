@@ -1,23 +1,33 @@
-import { Link } from 'react-router-dom'
+import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 function ProductCard({ product }) {
+  const { addToCart } = useCart();
+
   return (
-    <Link to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'black' }}>
-      <div style={{
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        padding: '12px',
-        width: '200px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        cursor: 'pointer'
-      }}>
-        <img src={product.image} alt={product.title} width="100%" height="150px"
-          style={{ objectFit: 'cover', borderRadius: '4px' }} />
-        <h4 style={{ margin: '8px 0 4px' }}>{product.title}</h4>
-        <p style={{ color: '#B12704', fontWeight: 'bold' }}>₹{product.price}</p>
-      </div>
-    </Link>
-  )
+    <Card className="m-2 shadow-sm" style={{ width: '18rem' }}>
+      <Link to={`/product/${product._id}`}>
+        <Card.Img variant="top" src={product.image} alt={product.title} style={{ height: '200px', objectFit: 'cover' }} />
+      </Link>
+      <Card.Body>
+        <Link to={`/product/${product._id}`} className="text-decoration-none text-dark">
+          <Card.Title className="text-truncate">{product.title}</Card.Title>
+        </Link>
+        <Card.Text className="fw-bold fs-5 text-danger">
+          ₹{product.price}
+        </Card.Text>
+        <Button 
+          variant="warning" 
+          className="w-100 fw-bold"
+          onClick={() => addToCart(product._id)}
+        >
+          Add to Cart
+        </Button>
+      </Card.Body>
+    </Card>
+  );
 }
 
-export default ProductCard
+export default ProductCard;
